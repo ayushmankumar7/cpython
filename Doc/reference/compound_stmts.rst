@@ -90,8 +90,8 @@ The :keyword:`!if` statement
 The :keyword:`if` statement is used for conditional execution:
 
 .. productionlist::
-   if_stmt: "if" `expression` ":" `suite`
-          : ("elif" `expression` ":" `suite`)*
+   if_stmt: "if" `assignment_expression` ":" `suite`
+          : ("elif" `assignment_expression` ":" `suite`)*
           : ["else" ":" `suite`]
 
 It selects exactly one of the suites by evaluating the expressions one by one
@@ -116,7 +116,7 @@ The :keyword:`while` statement is used for repeated execution as long as an
 expression is true:
 
 .. productionlist::
-   while_stmt: "while" `expression` ":" `suite`
+   while_stmt: "while" `assignment_expression` ":" `suite`
              : ["else" ":" `suite`]
 
 This repeatedly tests the expression and, if it is true, executes the first
@@ -507,7 +507,7 @@ A function definition defines a user-defined function object (see section
    funcdef: [`decorators`] "def" `funcname` "(" [`parameter_list`] ")"
           : ["->" `expression`] ":" `suite`
    decorators: `decorator`+
-   decorator: "@" `dotted_name` ["(" [`argument_list` [","]] ")"] NEWLINE
+   decorator: "@" `assignment_expression` NEWLINE
    dotted_name: `identifier` ("." `identifier`)*
    parameter_list: `defparameter` ("," `defparameter`)* "," "/" ["," [`parameter_list_no_posonly`]]
                  :   | `parameter_list_no_posonly`
@@ -550,6 +550,11 @@ is roughly equivalent to ::
 
 except that the original function is not temporarily bound to the name ``func``.
 
+.. versionchanged:: 3.9
+   Functions may be decorated with any valid :token:`assignment_expression`.
+   Previously, the grammar was much more restrictive; see :pep:`614` for
+   details.
+
 .. index::
    triple: default; parameter; value
    single: argument; function definition
@@ -566,9 +571,9 @@ value --- this is a syntactic restriction that is not expressed by the grammar.
 **Default parameter values are evaluated from left to right when the function
 definition is executed.** This means that the expression is evaluated once, when
 the function is defined, and that the same "pre-computed" value is used for each
-call.  This is especially important to understand when a default parameter is a
+call.  This is especially important to understand when a default parameter value is a
 mutable object, such as a list or a dictionary: if the function modifies the
-object (e.g. by appending an item to a list), the default value is in effect
+object (e.g. by appending an item to a list), the default parameter value is in effect
 modified.  This is generally not what was intended.  A way around this is to use
 ``None`` as the default, and explicitly test for it in the body of the function,
 e.g.::
@@ -716,6 +721,11 @@ is roughly equivalent to ::
 
 The evaluation rules for the decorator expressions are the same as for function
 decorators.  The result is then bound to the class name.
+
+.. versionchanged:: 3.9
+   Classes may be decorated with any valid :token:`assignment_expression`.
+   Previously, the grammar was much more restrictive; see :pep:`614` for
+   details.
 
 **Programmer's note:** Variables defined in the class definition are class
 attributes; they are shared by instances.  Instance attributes can be set in a
